@@ -87,14 +87,14 @@ namespace WindChat
             }
         }
 
-        public void display()
+        public void display(string time)
         {
             this.Show();
             // 加载内容
             if (m_ChatHistory.Count != 0)
             {
                 DateTime now = DateTime.Now;
-                SendedText.Text += now.ToLongTimeString() + "\n" + "  ";
+                SendedText.Text += time + "\n" + "  ";
                 foreach (string s in m_ChatHistory)
                 {
                     SendedText.Text += s;

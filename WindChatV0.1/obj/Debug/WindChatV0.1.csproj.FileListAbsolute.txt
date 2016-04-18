@@ -10,3 +10,4 @@ E:\Project\WindChatV0.1\WindChatV0.1\bin\Debug\Google.Protobuf.dll
 E:\Project\WindChatV0.1\WindChatV0.1\bin\Debug\Google.Protobuf.xml
 E:\Project\WindChatV0.1\WindChatV0.1\obj\Debug\WindChatV0.1.exe
 E:\Project\WindChatV0.1\WindChatV0.1\obj\Debug\WindChatV0.1.pdb
+E:\Project\WindChatV0.1\WindChatV0.1\obj\Debug\WindChatV0.1.csprojResolveAssemblyReference.cache

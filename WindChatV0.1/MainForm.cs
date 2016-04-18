@@ -366,7 +366,7 @@ namespace WindChat
          *  handle function
          * 
          */
-        public delegate void ProcessDelegate();
+        public delegate void ProcessDelegate(string time);
 
         public void handle_chat(Google.Protobuf.IMessage ms)
         {
@@ -407,7 +407,7 @@ namespace WindChat
 
 
                 // 窗口是否存在
-                Mark m = new Mark(send_id, recv_id);
+                Mark m = new Mark(recv_id, send_id);
                 Session session = SessionManager.get_instance().get_session(m);
 
 
@@ -419,7 +419,7 @@ namespace WindChat
                     SessionManager.get_instance().insert(m, session);
 
                     ProcessDelegate d = new ProcessDelegate(session.display);
-                    this.BeginInvoke(d);
+                    this.BeginInvoke(d, send_time);
                 }
                 else
                 {
@@ -521,16 +521,16 @@ namespace WindChat
 
         void handle_fetch_offline_message(Google.Protobuf.IMessage ms)
         {
-            var offline_message_field = ms.Descriptor.FindFieldByName("messages");
+            var offline_message_field = ms.Descriptor.FindFieldByName("chat_message");
 
             if (offline_message_field.IsRepeated)
             {
-                RepeatedField<IM.OfflineMessage> offline_messages = 
-                    (RepeatedField<IM.OfflineMessage>)(offline_message_field.Accessor.GetValue(ms));
+                RepeatedField<IM.ChatPkt> offline_messages = 
+                    (RepeatedField<IM.ChatPkt>)(offline_message_field.Accessor.GetValue(ms));
 
                 if (offline_messages.Count != 0)
                 {
-                    foreach (IM.OfflineMessage message in offline_messages)
+                    foreach (IM.ChatPkt message in offline_messages)
                     {
                         long send_id = message.SendId;
                         string content = message.Content;
@@ -538,7 +538,7 @@ namespace WindChat
 
 
                         // 窗口是否存在
-                        Mark m = new Mark(send_id, int.Parse(id));
+                        Mark m = new Mark(int.Parse(id), send_id);
                         Session session = SessionManager.get_instance().get_session(m);
 
 
@@ -548,7 +548,7 @@ namespace WindChat
                             SessionManager.get_instance().insert(m, session);
 
                             ProcessDelegate d = new ProcessDelegate(session.display);
-                            this.BeginInvoke(d);
+                            this.BeginInvoke(d, send_time);
                         }
                         else
                         {

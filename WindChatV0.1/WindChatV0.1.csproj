@@ -73,8 +73,8 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mark.cs" />
+    <Compile Include="MessageCach.cs" />
     <Compile Include="MsgTypeDef.cs" />
-    <Compile Include="OfflineMessage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Session.cs">
