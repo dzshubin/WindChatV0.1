@@ -1,0 +1,10 @@
+
+syntax="proto3";
+package IM;
+
+message ValidateResult
+{
+	int32 result = 1;	// 0-成功 1-失败 2-没有可用的服务器
+	string ip = 2;
+	string port = 3;
+};

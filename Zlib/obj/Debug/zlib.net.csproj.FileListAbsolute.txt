@@ -1,0 +1,9 @@
+C:\Users\shubin.FITFUN\Pictures\source\bin\Debug\zlib.net.dll
+C:\Users\shubin.FITFUN\Pictures\source\bin\Debug\zlib.net.pdb
+C:\Users\shubin.FITFUN\Pictures\source\obj\Debug\zlib.net.csprojResolveAssemblyReference.cache
+C:\Users\shubin.FITFUN\Pictures\source\obj\Debug\zlib.net.dll
+C:\Users\shubin.FITFUN\Pictures\source\obj\Debug\zlib.net.pdb
+E:\Project\WindChatV0.1\Zlib\bin\Debug\zlib.net.dll
+E:\Project\WindChatV0.1\Zlib\bin\Debug\zlib.net.pdb
+E:\Project\WindChatV0.1\Zlib\obj\Debug\zlib.net.dll
+E:\Project\WindChatV0.1\Zlib\obj\Debug\zlib.net.pdb

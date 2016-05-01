@@ -1,0 +1,12 @@
+syntax="proto3";
+package IM;
+
+
+import "operate_req_base.proto";
+
+
+message OperateChannel
+{
+    OperateReqBase req_base 	= 1;
+	int32   result				= 2;			// 加入/退出结果。 请求时不设置这个域
+}

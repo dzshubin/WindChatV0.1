@@ -1,0 +1,25 @@
+syntax="proto3";
+package IM;
+
+
+import "contacts.proto";
+
+message UserUpdateReq
+{
+    int64 req_id		= 1;	// 请求者id
+    int64 target_id		= 2;	// 目标用户id
+    int32 channel_id 	= 3;	// 频道id 可选
+}
+
+
+
+
+
+message UserUpdateAck
+{
+    int64 req_id	= 1;	// 请求者id
+    User  user		= 2;	// 用户信息
+    int32 channel_id	= 3;	// 频道id 可选
+}
+
+
