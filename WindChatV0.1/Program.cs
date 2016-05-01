@@ -16,7 +16,7 @@ namespace WindChat
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new MainForm());
+            // Application.Run(new Session());
             //Application.Run(new WindChat.Session());
 
             LoginForm lf = new LoginForm();
@@ -26,6 +26,10 @@ namespace WindChat
                 lf.Close();
                 MainForm mf = new MainForm();
                 Application.Run(mf);
+            }
+            else
+            {
+                Application.Exit();
             }
         }
     }

@@ -12,9 +12,11 @@ namespace WindChat
     class SessionManager
     {
         private static SessionManager m_Instance = null;
-        private Dictionary<Mark, WindChat.Session> m_Sessions = new Dictionary<Mark, WindChat.Session>(new Mark.EqualityComparer());
 
-        private Session m_session = new Session();
+        private Dictionary<Mark, WindChat.Session> m_sessions 
+            = new Dictionary<Mark, WindChat.Session>(new Mark.EqualityComparer());
+
+        private ChatSession m_ChatSession = new ChatSession();
 
         private SessionManager() 
         {
@@ -34,7 +36,7 @@ namespace WindChat
         {
             Boolean bFind = false;
 
-            foreach (var mark_ in m_Sessions.Keys)
+            foreach (var mark_ in m_sessions.Keys)
             {
                 if (mark_ == id_)
                 {
@@ -47,11 +49,10 @@ namespace WindChat
         }
 
 
-
         public WindChat.Session get_session(Mark id_)
         {
 
-            Boolean bFind = m_Sessions.ContainsKey(id_);
+            Boolean bFind = m_sessions.ContainsKey(id_);
 
             if (!bFind)
             {
@@ -59,29 +60,14 @@ namespace WindChat
             } 
             else
             {
-                return m_Sessions[id_];
+                return m_sessions[id_];
             }
 
         }
 
-        public void add(Mark id_, string context_)
+        public Boolean insert(Mark id_, WindChat.Session session_)
         {
-            m_session = new Session(id_, context_);
-            insert(id_, m_session);
-        }
-
-
-        public void add(Mark id_)
-        {
-            m_session = new Session(id_);
-            insert(id_, m_session);
-
-
-        }
-
-        public Boolean insert(Mark id_, WindChat.Session Session_)
-        {
-            Boolean bFind = m_Sessions.ContainsKey(id_);
+            Boolean bFind = m_sessions.ContainsKey(id_);
 
             if (bFind)
             {
@@ -89,8 +75,7 @@ namespace WindChat
             } 
             else
             {
-                m_Sessions.Add(id_, Session_);
-                //m_Sessions.add()[id_] = Session_;
+                m_sessions.Add(id_, session_);
                 return true;
             }
         }
@@ -98,7 +83,7 @@ namespace WindChat
 
         public void remove(Mark id_)
         {
-            m_Sessions.Remove(id_);
+            m_sessions.Remove(id_);
         }
     }
 }

@@ -9,10 +9,12 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CCWin;
+
 
 namespace WindChat
 {
-    public partial class LoginForm : Form
+    public partial class LoginForm : Skin_Mac
     {
         private TcpClient tcpClient;
 
@@ -57,7 +59,7 @@ namespace WindChat
             int be_data_len = IPAddress.HostToNetworkOrder(data_len);
             byte[] by_data_len = BitConverter.GetBytes(be_data_len);
 
-            MessageBox.Show("data_len: " + data_len);
+           // MessageBox.Show("data_len: " + data_len);
 
 
             NetworkStream ns = tcpClient.GetStream();
@@ -161,17 +163,27 @@ namespace WindChat
 
                 MainForm.id = textBox1.Text.Trim();
                 MainForm.passwd = textBox2.Text.Trim();
+                this.DialogResult = DialogResult.OK;
             }
             else if (result == 2)
             {
                 MessageBox.Show("没有可用的服务器！");
+                this.DialogResult = DialogResult.Cancel;
             }
+            else if(result == 3)
+            {
+
+                MessageBox.Show("已经登陆了！");
+                this.DialogResult = DialogResult.Cancel;
+            }
+
             else
             {
                 MessageBox.Show("登陆失败！");
+                this.DialogResult = DialogResult.Cancel;
             }
 
-            this.DialogResult = DialogResult.OK;    //返回一个登录成功的对话框状态
+           ;    //返回一个登录成功的对话框状态
         }
 
         private void LoginForm_Load(object sender, EventArgs e)

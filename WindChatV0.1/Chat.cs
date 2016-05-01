@@ -24,12 +24,15 @@ namespace IM {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CgpjaGF0LnByb3RvEgJJTSJPCgdDaGF0UGt0Eg8KB3NlbmRfaWQYASABKAMS",
-            "DwoHcmVjdl9pZBgCIAEoAxIPCgdjb250ZW50GAMgASgJEhEKCXNlbmRfdGlt",
-            "ZRgEIAEoCWIGcHJvdG8z"));
+            "DwoHcmVjdl9pZBgCIAEoAxIPCgdjb250ZW50GAMgASgMEhEKCXNlbmRfdGlt",
+            "ZRgEIAEoCSJqCg5DaGFubmVsQ2hhdFBrdBIPCgdzZW5kX2lkGAEgASgDEg8K",
+            "B3JlY3ZfaWQYAiABKAMSEgoKY2hhbm5lbF9pZBgDIAEoBRIPCgdjb250ZW50",
+            "GAQgASgMEhEKCXNlbmRfdGltZRgFIAEoCWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedCodeInfo(null, new pbr::GeneratedCodeInfo[] {
-            new pbr::GeneratedCodeInfo(typeof(global::IM.ChatPkt), global::IM.ChatPkt.Parser, new[]{ "SendId", "RecvId", "Content", "SendTime" }, null, null, null)
+            new pbr::GeneratedCodeInfo(typeof(global::IM.ChatPkt), global::IM.ChatPkt.Parser, new[]{ "SendId", "RecvId", "Content", "SendTime" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::IM.ChannelChatPkt), global::IM.ChannelChatPkt.Parser, new[]{ "SendId", "RecvId", "ChannelId", "Content", "SendTime" }, null, null, null)
           }));
     }
     #endregion
@@ -70,7 +73,7 @@ namespace IM {
     public const int SendIdFieldNumber = 1;
     private long sendId_;
     /// <summary>
-    ///  ∑¢ÀÕ’ﬂid
+    ///  ÂèëÈÄÅËÄÖid
     /// </summary>
     public long SendId {
       get { return sendId_; }
@@ -83,7 +86,7 @@ namespace IM {
     public const int RecvIdFieldNumber = 2;
     private long recvId_;
     /// <summary>
-    ///  Ω” ‹’ﬂid
+    ///  Êé•ÂèóËÄÖid
     /// </summary>
     public long RecvId {
       get { return recvId_; }
@@ -94,11 +97,11 @@ namespace IM {
 
     /// <summary>Field number for the "content" field.</summary>
     public const int ContentFieldNumber = 3;
-    private string content_ = "";
+    private pb::ByteString content_ = pb::ByteString.Empty;
     /// <summary>
-    ///  ∑¢ÀÕƒ⁄»›
+    ///  ËÅäÂ§©ÂÜÖÂÆπ
     /// </summary>
-    public string Content {
+    public pb::ByteString Content {
       get { return content_; }
       set {
         content_ = pb::Preconditions.CheckNotNull(value, "value");
@@ -109,7 +112,7 @@ namespace IM {
     public const int SendTimeFieldNumber = 4;
     private string sendTime_ = "";
     /// <summary>
-    ///  ∑¢ÀÕ ±º‰
+    ///  ÂèëÈÄÅÊó∂Èó¥
     /// </summary>
     public string SendTime {
       get { return sendTime_; }
@@ -160,7 +163,7 @@ namespace IM {
       }
       if (Content.Length != 0) {
         output.WriteRawTag(26);
-        output.WriteString(Content);
+        output.WriteBytes(Content);
       }
       if (SendTime.Length != 0) {
         output.WriteRawTag(34);
@@ -177,7 +180,7 @@ namespace IM {
         size += 1 + pb::CodedOutputStream.ComputeInt64Size(RecvId);
       }
       if (Content.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Content);
+        size += 1 + pb::CodedOutputStream.ComputeBytesSize(Content);
       }
       if (SendTime.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(SendTime);
@@ -219,10 +222,236 @@ namespace IM {
             break;
           }
           case 26: {
-            Content = input.ReadString();
+            Content = input.ReadBytes();
             break;
           }
           case 34: {
+            SendTime = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+  public sealed partial class ChannelChatPkt : pb::IMessage<ChannelChatPkt> {
+    private static readonly pb::MessageParser<ChannelChatPkt> _parser = new pb::MessageParser<ChannelChatPkt>(() => new ChannelChatPkt());
+    public static pb::MessageParser<ChannelChatPkt> Parser { get { return _parser; } }
+
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::IM.ChatReflection.Descriptor.MessageTypes[1]; }
+    }
+
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    public ChannelChatPkt() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    public ChannelChatPkt(ChannelChatPkt other) : this() {
+      sendId_ = other.sendId_;
+      recvId_ = other.recvId_;
+      channelId_ = other.channelId_;
+      content_ = other.content_;
+      sendTime_ = other.sendTime_;
+    }
+
+    public ChannelChatPkt Clone() {
+      return new ChannelChatPkt(this);
+    }
+
+    /// <summary>Field number for the "send_id" field.</summary>
+    public const int SendIdFieldNumber = 1;
+    private long sendId_;
+    /// <summary>
+    ///  ÂèëÈÄÅËÄÖid
+    /// </summary>
+    public long SendId {
+      get { return sendId_; }
+      set {
+        sendId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "recv_id" field.</summary>
+    public const int RecvIdFieldNumber = 2;
+    private long recvId_;
+    /// <summary>
+    ///  Êé•ÂèóËÄÖid
+    /// </summary>
+    public long RecvId {
+      get { return recvId_; }
+      set {
+        recvId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "channel_id" field.</summary>
+    public const int ChannelIdFieldNumber = 3;
+    private int channelId_;
+    /// <summary>
+    ///  È¢ëÈÅìid
+    /// </summary>
+    public int ChannelId {
+      get { return channelId_; }
+      set {
+        channelId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "content" field.</summary>
+    public const int ContentFieldNumber = 4;
+    private pb::ByteString content_ = pb::ByteString.Empty;
+    /// <summary>
+    ///  ËÅäÂ§©ÂÜÖÂÆπ
+    /// </summary>
+    public pb::ByteString Content {
+      get { return content_; }
+      set {
+        content_ = pb::Preconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "send_time" field.</summary>
+    public const int SendTimeFieldNumber = 5;
+    private string sendTime_ = "";
+    /// <summary>
+    ///  ÂèëÈÄÅÊó∂Èó¥	
+    /// </summary>
+    public string SendTime {
+      get { return sendTime_; }
+      set {
+        sendTime_ = pb::Preconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    public override bool Equals(object other) {
+      return Equals(other as ChannelChatPkt);
+    }
+
+    public bool Equals(ChannelChatPkt other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (SendId != other.SendId) return false;
+      if (RecvId != other.RecvId) return false;
+      if (ChannelId != other.ChannelId) return false;
+      if (Content != other.Content) return false;
+      if (SendTime != other.SendTime) return false;
+      return true;
+    }
+
+    public override int GetHashCode() {
+      int hash = 1;
+      if (SendId != 0L) hash ^= SendId.GetHashCode();
+      if (RecvId != 0L) hash ^= RecvId.GetHashCode();
+      if (ChannelId != 0) hash ^= ChannelId.GetHashCode();
+      if (Content.Length != 0) hash ^= Content.GetHashCode();
+      if (SendTime.Length != 0) hash ^= SendTime.GetHashCode();
+      return hash;
+    }
+
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (SendId != 0L) {
+        output.WriteRawTag(8);
+        output.WriteInt64(SendId);
+      }
+      if (RecvId != 0L) {
+        output.WriteRawTag(16);
+        output.WriteInt64(RecvId);
+      }
+      if (ChannelId != 0) {
+        output.WriteRawTag(24);
+        output.WriteInt32(ChannelId);
+      }
+      if (Content.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteBytes(Content);
+      }
+      if (SendTime.Length != 0) {
+        output.WriteRawTag(42);
+        output.WriteString(SendTime);
+      }
+    }
+
+    public int CalculateSize() {
+      int size = 0;
+      if (SendId != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(SendId);
+      }
+      if (RecvId != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(RecvId);
+      }
+      if (ChannelId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(ChannelId);
+      }
+      if (Content.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeBytesSize(Content);
+      }
+      if (SendTime.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(SendTime);
+      }
+      return size;
+    }
+
+    public void MergeFrom(ChannelChatPkt other) {
+      if (other == null) {
+        return;
+      }
+      if (other.SendId != 0L) {
+        SendId = other.SendId;
+      }
+      if (other.RecvId != 0L) {
+        RecvId = other.RecvId;
+      }
+      if (other.ChannelId != 0) {
+        ChannelId = other.ChannelId;
+      }
+      if (other.Content.Length != 0) {
+        Content = other.Content;
+      }
+      if (other.SendTime.Length != 0) {
+        SendTime = other.SendTime;
+      }
+    }
+
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            input.SkipLastField();
+            break;
+          case 8: {
+            SendId = input.ReadInt64();
+            break;
+          }
+          case 16: {
+            RecvId = input.ReadInt64();
+            break;
+          }
+          case 24: {
+            ChannelId = input.ReadInt32();
+            break;
+          }
+          case 34: {
+            Content = input.ReadBytes();
+            break;
+          }
+          case 42: {
             SendTime = input.ReadString();
             break;
           }

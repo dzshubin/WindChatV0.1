@@ -3,148 +3,100 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-
+using CCWin;
+using System.IO;
+using CustomUIControls;
+using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace WindChat
 {
-    public partial class Session : Form
+    public partial class Session : CCWin.Skin_Mac
     {
+        protected Boolean m_bFlashFlag = false;
+        protected List<string> m_ChatHistory = new List<string>();
+        protected Mark m_mark; //唯一标识一个窗体
 
-        private Boolean m_bFlashFlag = false;
-        private List<string> m_ChatHistory = new List<string>();
-        private Mark m_mark; //唯一标识一个窗体
+
+        protected ImageList imageList;
+        protected ImageListPopup ilp;      // 表情选择框
 
 
-        public Session()
+        public Session(): base()
         {
             InitializeComponent();
+
+            load();
         }
 
         ~Session()
         {
-
+            
         }
 
         public Session(Mark mark_)
         {
             InitializeComponent();
+
+
+
+            load();
             m_mark = mark_;
         }
 
-        public Session(Mark mark_, string context_)
+        public Session(Mark mark_, byte[] context_)
         {
             InitializeComponent();
-            m_ChatHistory.Add(context_);
+
+            load();
+
+
+            m_ChatHistory.Add(Encoding.UTF8.GetString(context_));
             m_mark = mark_;
-        }
-
-
-        private void SendBtn_Click(object sender, EventArgs e)
-        {
-            IM.ChatPkt chatPkt = new IM.ChatPkt();
-            if (SendingText.Text.Trim() == "")
-            {
-                MessageBox.Show("发送内容不能为空");
-                return;
-            }
-
-
-            DateTime now = DateTime.Now;
-            SendedText.Text += now.ToLongTimeString() + "\n" + "  " + SendingText.Text + "\n";
-
-
-            chatPkt.Content = SendingText.Text;
-            SendingText.Text = "";
-
-            // 发送者ID、接受者ID、内容
-            chatPkt.RecvId = m_mark.Recv_id;
-            chatPkt.SendId = m_mark.Send_id;
-            
-            MainForm.AsyncSend(MainForm.m_client, chatPkt, 1001);
-        }
-
-
-        public void flash()
-        {
-            this.Hide();
-            this.FlashTimer.Enabled = true;
-            this.FlashNotify.Visible = true;
-        }
-
-        private void FlashTimer_Tick(object sender, EventArgs e)
-        {
-            if (m_bFlashFlag)
-            {
-                FlashNotify.Icon = new Icon("12.ico");
-                m_bFlashFlag = !m_bFlashFlag;
-            }
-            else
-            {
-                FlashNotify.Icon = new Icon("13.ico");
-                m_bFlashFlag = !m_bFlashFlag;
-            }
         }
 
         public void display(string time)
         {
-            this.Show();
-            // 加载内容
-            if (m_ChatHistory.Count != 0)
-            {
-                DateTime now = DateTime.Now;
-                SendedText.Text += time + "\n" + "  ";
-                foreach (string s in m_ChatHistory)
-                {
-                    SendedText.Text += s;
-                }
-
-                SendedText.Text += "\n";
-            }
-            else
-            {
-
-            }
+            this.show();
+            OnDisplay(time);
         }
 
 
-        public void FlashNotify_DoubleClick(object sender, EventArgs e)
+        private void OnDisplay(string time)
         {
-            FlashNotify.Visible = false;
-            FlashTimer.Enabled = false;
-
-            this.Show();
-
             // 加载内容
-            if (m_ChatHistory.Count != 0)
+            foreach(string message in m_ChatHistory)
             {
-                DateTime now = DateTime.Now;
-                SendedText.Text += now.ToLongTimeString() + "\n" + "  ";
-                foreach (string s in m_ChatHistory)
-                {
-                    SendedText.Text += s;
-                }
-
-                SendedText.Text += "\n";
+                AddMessage(time, message);
             }
-            else
-            {
-
-            }
-
-
         }
 
-        public void add_message(string context_, string time)
+
+
+        public void add_message(byte[] context_, string time)
         {
-            m_ChatHistory.Add(context_);
 
-            DateTime now = DateTime.Now;
-            this.SendedText.Text += time + "\n" + "  ";
-            this.SendedText.Text += context_;
-            this.SendedText.Text += "\n";
+            string de_context = Encoding.UTF8.GetString(context_);
+            m_ChatHistory.Add(de_context);
+
+            AddMessage(time, de_context);
         }
+
+        private void AddMessage(string time, string message)
+        {
+            SendedText.Text += time;
+            SendedText.Text += "\r\n";
+            SendedText.Text += "  " + message;
+            SendedText.Text += "\r\n";
+ 
+        }
+
+        public delegate   void Del_ShowMessage(string message);
+        public delegate void Del_AddMessage(string time, string message);
 
 
         private void Session_FormClosing(object sender, FormClosingEventArgs e)
@@ -153,14 +105,10 @@ namespace WindChat
             {
                 SessionManager.get_instance().remove(m_mark);
             }
-            
         }
-
 
         private void Session_Resize(object sender, EventArgs e)
         {
-      
-
             if (this.WindowState == FormWindowState.Minimized)
             {
                 this.ShowInTaskbar = true;
@@ -168,8 +116,238 @@ namespace WindChat
         }
 
         private void Session_Load(object sender, EventArgs e)
-        {
+        {       
         }
 
+
+        private void load()
+        {
+            imageList = new ImageList();
+            imageList.ImageSize = new Size(32, 32);
+            imageList.ColorDepth = ColorDepth.Depth32Bit;       //32位的带alpha通道的可以直接透明
+            imageList.Images.AddStrip(WindChatV0._1.Properties.Resources.face2);  //加载资源表情图片          
+
+            ilp = new ImageListPopup();
+            ilp.Init(imageList, 8, 8, 10, 2);   //水平、垂直线间距，表情显示的列和行
+            ilp.ItemClick += new ImageListPopupEventHandler(OnItemClicked);
+
+        }
+
+        /************************************************************************/
+        /* 选择了表情                                                  */
+        /************************************************************************/
+        public void OnItemClicked(object sender, ImageListPopupEventArgs e)
+        {
+            Image img = imageList.Images[e.SelectedItem];
+
+
+
+            Clipboard.SetDataObject(img);
+            SendingText.ReadOnly = false;
+        }
+
+
+
+        public virtual void show() { }
+
+
+        private void SendFile(byte[] file_data)
+        {
+
+        }
+
+
+
+
+
+
+        public static byte[] ReadFile(string filePath)
+        {
+            byte[] buffer;
+            FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            try
+            {
+                int length = (int)fileStream.Length;  // get file length
+                buffer = new byte[length];            // create buffer
+                int count;                            // actual number of bytes read
+                int sum = 0;                          // total number of bytes read
+
+                // read until Read method returns 0 (end of the stream has been reached)
+                while ((count = fileStream.Read(buffer, sum, length - sum)) > 0)
+                    sum += count;  // sum is a buffer offset for next reading
+            }
+            finally
+            {
+                fileStream.Close();
+            }
+            return buffer;
+        }
+
+
+        public static void WirteFile(string file_name, byte[] file_byte)
+        {
+            string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.
+                GetExecutingAssembly().Location);
+
+
+            string path = dir + @"\File\" + file_name;
+            FileStream fileStream = new FileStream(path, FileMode.Create);
+
+            try
+            {
+                fileStream.Write(file_byte, 0, file_byte.Length);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+
+            }
+            finally
+            {
+                fileStream.Close();
+            }
+
+
+            // 打开并选中
+            string args = string.Format("/Select, {0}", path);
+            System.Diagnostics.Process.Start(new ProcessStartInfo("Explorer.exe", args));
+
+
+        }
+
+        private void FaceBtn_Click(object sender, EventArgs e)
+        {
+            //Point pt = PointToScreen(new Point(FaceBtn.Left, FaceBtn.Top));
+
+            //if (ilp.InvokeRequired)
+            //{
+
+            //    Dele_show _show = new Dele_show(ilp.Show);
+            //    this.BeginInvoke(_show, pt.X, pt.Y - 80);
+            //}
+            //else
+            //{
+            //    ilp.Show(pt.X, pt.Y - 80);
+            //}
+            
+        }
+
+        public delegate void Dele_show(int x, int y);
+        public delegate void Dele_Addmsg(byte[] context_, string time);
+
+        private void SendBtn_Click(object sender, EventArgs e)
+        {
+
+            SendedText.Text += DateTime.Now.ToString();
+            SendedText.Text += "\r\n";
+            SendedText.Text += "  " + SendingText.Text;
+            SendedText.Text += "\r\n";
+
+
+            SendingText.Focus();
+        }
+
+
+
+        private void SendingText_DragEnter_1(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+            }
+        }
+
+        private void SendingText_DragDrop_1(object sender, DragEventArgs e)
+        {
+            String[] files = e.Data.GetData(DataFormats.FileDrop, false) as String[];
+
+            if (files.Count() == 0)
+            {
+                return;
+            }
+
+            // 提示玩家是否发送
+            DialogResult dr = MessageBox.Show("是否发送文件？", "通知", MessageBoxButtons.YesNo,
+                     MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
+            if (dr != DialogResult.Yes)
+            {
+                return;
+            }
+
+            else
+            {
+                SendFilePb(files[0]);
+            }
+        }
+
+
+        private void SendFilePb(string file_path)
+        {
+            /// 获得文件数据
+            byte[] file_data = ReadFile(file_path);
+            if (file_data.Length == 0)
+            {
+                return;
+            }
+
+            byte[] file_bytes = Compression.compressBytes(file_data);
+
+            IM.FileTrans file_trans = new IM.FileTrans();
+            file_trans.ReqId = m_mark.Send_id;
+            file_trans.TargetId = m_mark.Recv_id;
+            file_trans.Name = file_path.Substring(file_path.LastIndexOf('\\') + 1);
+            file_trans.Data = Google.Protobuf.ByteString.CopyFrom(file_bytes, 0, file_bytes.Length);
+
+            // 发送文件
+            MainForm.AsyncSend(MainForm.m_client, file_trans,
+                (int)MsgTypeDef.Type.CUSTOM_MSG_FILE_TRANSLATION);
+
+
+            string tips = "成功发送文件: " + file_trans.Name;
+
+            Dele_Addmsg _add = new Dele_Addmsg(this.add_message);
+            this.BeginInvoke(_add, Encoding.UTF8.GetBytes(tips), DateTime.Now.ToString());
+
+
+        }
+        private void OpenFileBtn_Click(object sender, EventArgs e)
+        {
+
+
+
+            //InitialDirectory 默认打开文件夹的位置  
+            openFileDialog.InitialDirectory = "d:\\";
+            //Filter 允许打开文件的格式  显示在Dialg中的Files of Type  
+            openFileDialog.Filter = "Text files (*.txt)| *.txt | Pdf file (*.pdf)|*.pdf| All files (*.*)|*.*";
+            //显示在Dialg中的Files of Type的选择  
+            openFileDialog.FilterIndex = 1;
+
+            openFileDialog.RestoreDirectory = true;
+            openFileDialog.Title = "选择文件";
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                //文件路径 和文件名字  
+                string filePath = openFileDialog.FileName;
+                string fileName = Path.GetFileName(filePath);
+                // 获取文件后缀  
+                string fileExtension = Path.GetExtension(filePath);
+
+
+                DialogResult dr = MessageBox.Show("是否发送文件: " + fileName + " ？", 
+                    "通知", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
+                if (dr != DialogResult.Yes)
+                {
+                    return;
+                }
+
+                SendFilePb(filePath);
+
+            }
+        }
     }
 }

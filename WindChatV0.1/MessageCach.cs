@@ -25,11 +25,14 @@ namespace IM {
           string.Concat(
             "ChJtZXNzYWdlX2NhY2gucHJvdG8SAklNGgpjaGF0LnByb3RvIkEKC01lc3Nh",
             "Z2VDYWNoEg8KB3VzZXJfaWQYASABKAMSIQoMY2hhdF9tZXNzYWdlGAIgAygL",
-            "MgsuSU0uQ2hhdFBrdGIGcHJvdG8z"));
+            "MgsuSU0uQ2hhdFBrdCJOCg5DaGFubmVsTXNnQ2FjaBIOCgZyZXFfaWQYASAB",
+            "KAMSLAoQY2hhbm5lbF9tZXNzYWdlcxgCIAMoCzISLklNLkNoYW5uZWxDaGF0",
+            "UGt0YgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::IM.ChatReflection.Descriptor, },
           new pbr::GeneratedCodeInfo(null, new pbr::GeneratedCodeInfo[] {
-            new pbr::GeneratedCodeInfo(typeof(global::IM.MessageCach), global::IM.MessageCach.Parser, new[]{ "UserId", "ChatMessage" }, null, null, null)
+            new pbr::GeneratedCodeInfo(typeof(global::IM.MessageCach), global::IM.MessageCach.Parser, new[]{ "UserId", "ChatMessage" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::IM.ChannelMsgCach), global::IM.ChannelMsgCach.Parser, new[]{ "ReqId", "ChannelMessages" }, null, null, null)
           }));
     }
     #endregion
@@ -68,7 +71,7 @@ namespace IM {
     public const int UserIdFieldNumber = 1;
     private long userId_;
     /// <summary>
-    ///   �û�id
+    ///  用户id
     /// </summary>
     public long UserId {
       get { return userId_; }
@@ -83,7 +86,7 @@ namespace IM {
         = pb::FieldCodec.ForMessage(18, global::IM.ChatPkt.Parser);
     private readonly pbc::RepeatedField<global::IM.ChatPkt> chatMessage_ = new pbc::RepeatedField<global::IM.ChatPkt>();
     /// <summary>
-    ///   ������Ϣ���� 
+    ///  离线消息集合
     /// </summary>
     public pbc::RepeatedField<global::IM.ChatPkt> ChatMessage {
       get { return chatMessage_; }
@@ -156,6 +159,137 @@ namespace IM {
           }
           case 18: {
             chatMessage_.AddEntriesFrom(input, _repeated_chatMessage_codec);
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  /// <summary>
+  ///  频道离线消息集合
+  /// </summary>
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+  public sealed partial class ChannelMsgCach : pb::IMessage<ChannelMsgCach> {
+    private static readonly pb::MessageParser<ChannelMsgCach> _parser = new pb::MessageParser<ChannelMsgCach>(() => new ChannelMsgCach());
+    public static pb::MessageParser<ChannelMsgCach> Parser { get { return _parser; } }
+
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::IM.MessageCachReflection.Descriptor.MessageTypes[1]; }
+    }
+
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    public ChannelMsgCach() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    public ChannelMsgCach(ChannelMsgCach other) : this() {
+      reqId_ = other.reqId_;
+      channelMessages_ = other.channelMessages_.Clone();
+    }
+
+    public ChannelMsgCach Clone() {
+      return new ChannelMsgCach(this);
+    }
+
+    /// <summary>Field number for the "req_id" field.</summary>
+    public const int ReqIdFieldNumber = 1;
+    private long reqId_;
+    /// <summary>
+    ///  请求者id
+    /// </summary>
+    public long ReqId {
+      get { return reqId_; }
+      set {
+        reqId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "channel_messages" field.</summary>
+    public const int ChannelMessagesFieldNumber = 2;
+    private static readonly pb::FieldCodec<global::IM.ChannelChatPkt> _repeated_channelMessages_codec
+        = pb::FieldCodec.ForMessage(18, global::IM.ChannelChatPkt.Parser);
+    private readonly pbc::RepeatedField<global::IM.ChannelChatPkt> channelMessages_ = new pbc::RepeatedField<global::IM.ChannelChatPkt>();
+    /// <summary>
+    ///  频道离线消息集合
+    /// </summary>
+    public pbc::RepeatedField<global::IM.ChannelChatPkt> ChannelMessages {
+      get { return channelMessages_; }
+    }
+
+    public override bool Equals(object other) {
+      return Equals(other as ChannelMsgCach);
+    }
+
+    public bool Equals(ChannelMsgCach other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (ReqId != other.ReqId) return false;
+      if(!channelMessages_.Equals(other.channelMessages_)) return false;
+      return true;
+    }
+
+    public override int GetHashCode() {
+      int hash = 1;
+      if (ReqId != 0L) hash ^= ReqId.GetHashCode();
+      hash ^= channelMessages_.GetHashCode();
+      return hash;
+    }
+
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (ReqId != 0L) {
+        output.WriteRawTag(8);
+        output.WriteInt64(ReqId);
+      }
+      channelMessages_.WriteTo(output, _repeated_channelMessages_codec);
+    }
+
+    public int CalculateSize() {
+      int size = 0;
+      if (ReqId != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(ReqId);
+      }
+      size += channelMessages_.CalculateSize(_repeated_channelMessages_codec);
+      return size;
+    }
+
+    public void MergeFrom(ChannelMsgCach other) {
+      if (other == null) {
+        return;
+      }
+      if (other.ReqId != 0L) {
+        ReqId = other.ReqId;
+      }
+      channelMessages_.Add(other.channelMessages_);
+    }
+
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            input.SkipLastField();
+            break;
+          case 8: {
+            ReqId = input.ReadInt64();
+            break;
+          }
+          case 18: {
+            channelMessages_.AddEntriesFrom(input, _repeated_channelMessages_codec);
             break;
           }
         }
