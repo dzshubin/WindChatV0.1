@@ -16,7 +16,7 @@ namespace WindChat
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            // Application.Run(new Session());
+            //Application.Run(new ChatSession());
             //Application.Run(new WindChat.Session());
 
             LoginForm lf = new LoginForm();

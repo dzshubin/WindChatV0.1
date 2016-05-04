@@ -31,7 +31,7 @@ namespace WindChat
 
 
         private string m_strName_ = string.Empty;
-        private string m_strNick_name_ = string.Empty;
+        public static string m_strNick_name_ = string.Empty;
         private int m_nSex_ = 0;
 
 
@@ -213,7 +213,7 @@ namespace WindChat
                 string type_name_long = type_name + "\0";
 
                 byte[] byte_name = Encoding.UTF8.GetBytes(type_name_long);
-                MessageBox.Show("type name: " + type_name_long);
+                //MessageBox.Show("type name: " + type_name_long);
 
                 // NameLen
                 int name_len = type_name_long.Length;
@@ -476,6 +476,15 @@ namespace WindChat
                     handle_file_recv(ms);
                     break;
 
+                case (int)MsgTypeDef.Type.CUSTOM_MSG_FETCH_CHANNEL_HISTORY:
+                    handle_fetch_channel_history(ms);
+                    break;
+
+                case (int)MsgTypeDef.Type.CUSTOM_MSG_FETCH_HISTORY:
+                    handle_fetch_history(ms);
+                    break;
+
+
                 default:
                     MessageBox.Show("invalid type !");
                     break;
@@ -499,17 +508,24 @@ namespace WindChat
             var recv_id_field = ms.Descriptor.FindFieldByName("recv_id");
             var content_field = ms.Descriptor.FindFieldByName("content");
             var send_time_field = ms.Descriptor.FindFieldByName("send_time");
+            var send_name_field = ms.Descriptor.FindFieldByName("send_name");
 
 
             Int64 send_id = Int64.Parse(send_id_field.Accessor.GetValue(ms).ToString());
             Int64 recv_id = Int64.Parse(recv_id_field.Accessor.GetValue(ms).ToString());
             string send_time = send_time_field.Accessor.GetValue(ms).ToString();
+            string send_name = send_name_field.Accessor.GetValue(ms).ToString();
+
 
             Google.Protobuf.ByteString send_bytes 
                 = content_field.Accessor.GetValue(ms) as Google.Protobuf.ByteString;
 
             byte[] content = new byte[send_bytes.Length];
             send_bytes.CopyTo(content, 0);
+
+
+            CMessage message = new CMessage(send_name, send_time, Encoding.UTF8.GetString(content));
+
 
             if (send_id != 0 && recv_id != 0)
             {
@@ -523,8 +539,9 @@ namespace WindChat
                 {
                     MessageBox.Show("聊天窗口不存在！新建一个！");
 
-                    ChatSession chat_session = new ChatSession(m, content);
+                    ChatSession chat_session = new ChatSession(m, message);
                     SessionManager.get_instance().insert(m, chat_session);
+
 
 
                     IM.UserUpdateReq req = new IM.UserUpdateReq();
@@ -535,8 +552,8 @@ namespace WindChat
                         (int)MsgTypeDef.Type.CUSTOM_MSG_CHANNEL_USER_UPDATE);
 
 
-                    Dele_Display _display = new Dele_Display(chat_session.display);
-                    this.BeginInvoke(_display, send_time);
+                    Dele_Show _display = new Dele_Show(chat_session.display);
+                    this.BeginInvoke(_display);
 
                 }
                 else
@@ -546,7 +563,7 @@ namespace WindChat
                     session.ShowInTaskbar = true;
 
                     Dele_AddMessage add_ = new Dele_AddMessage(session.add_message);
-                    this.BeginInvoke(add_, content, send_time);
+                    this.BeginInvoke(add_, message);
 
                 }
             }
@@ -565,7 +582,7 @@ namespace WindChat
             var content_field   = ms.Descriptor.FindFieldByName("content");
             var send_time_field = ms.Descriptor.FindFieldByName("send_time");
             var channel_id_field = ms.Descriptor.FindFieldByName("channel_id");
-
+            var send_name_field = ms.Descriptor.FindFieldByName("send_name");
 
             if (send_id_field == null || recv_id_field == null 
                 || content_field == null || send_time_field == null 
@@ -580,6 +597,8 @@ namespace WindChat
             Int64 send_id = Int64.Parse(send_id_field.Accessor.GetValue(ms).ToString());
             Int64 recv_id = Int64.Parse(recv_id_field.Accessor.GetValue(ms).ToString());
             string send_time = send_time_field.Accessor.GetValue(ms).ToString();
+            string send_name = send_name_field.Accessor.GetValue(ms).ToString();
+
             int channel_id = int.Parse(channel_id_field.Accessor.GetValue(ms).ToString());
 
 
@@ -595,20 +614,27 @@ namespace WindChat
             Session session = SessionManager.get_instance().get_session(m);
 
 
+
+            CMessage message = new CMessage
+                (send_name, send_time, Encoding.UTF8.GetString(content));
+
+
             if (session == null)
             {
-                ChannelSession ch_session = new ChannelSession(m, content);
+                ChannelSession ch_session = new ChannelSession(m, message);
                 SessionManager.get_instance().insert(m, ch_session);
 
                 IM.Channel channel = m_channels[channel_id];
                 ch_session.Text = channel.Name;
 
+
                 // 加载缓存数据
                 Dele_AddChannelMember _add_memeber = new Dele_AddChannelMember(ch_session.load_members);
                 this.BeginInvoke(_add_memeber, m_channels[channel_id]);
 
-                Dele_Display _dispaly = new Dele_Display(ch_session.display);
-                this.BeginInvoke(_dispaly, send_time);
+
+                Dele_Show _dispaly = new Dele_Show(ch_session.display);
+                this.BeginInvoke(_dispaly);
             }
             else
             {
@@ -617,7 +643,7 @@ namespace WindChat
                 session.ShowInTaskbar = true;
 
                 Dele_AddMessage add_ = new Dele_AddMessage(session.add_message);
-                this.BeginInvoke(add_, content, send_time);
+                this.BeginInvoke(add_, message);
 
             }
 
@@ -718,9 +744,15 @@ namespace WindChat
                 long send_id        = message.SendId;
                 int channel_id      = message.ChannelId;
                 string send_time    = message.SendTime;
+                string send_name    = message.SendName;
+
 
                 byte[] content = new byte[message.Content.Length];
                 message.Content.CopyTo(content, 0);
+
+                CMessage entry_message = 
+                    new CMessage(send_name, send_time, Encoding.UTF8.GetString(content));
+
 
                 // 窗口是否存在
                 Mark m = new Mark(long.Parse(MainForm.id), channel_id);
@@ -732,7 +764,7 @@ namespace WindChat
                     MessageBox.Show("新建一个！发送者id: " + id + "频道id: " + channel_id);
 
 
-                    ChannelSession session = new ChannelSession(m, content);
+                    ChannelSession session = new ChannelSession(m, entry_message);
                     SessionManager.get_instance().insert(m, session);
 
                     IM.Channel channel = m_channels[channel_id];
@@ -743,8 +775,8 @@ namespace WindChat
                     Dele_AddChannelMember _add_memeber = new Dele_AddChannelMember(session.load_members);
                     this.BeginInvoke(_add_memeber, m_channels[channel_id]);
 
-                    Dele_Display _display = new Dele_Display(session.display);
-                    this.BeginInvoke(_display, send_time);
+                    Dele_Show _display = new Dele_Show(session.display);
+                    this.BeginInvoke(_display);
 
                 }
                 else
@@ -753,7 +785,7 @@ namespace WindChat
                     chSession.ShowInTaskbar = true;
 
                     Dele_AddMessage add_ = new Dele_AddMessage(chSession.add_message);
-                    this.BeginInvoke(add_, content, send_time);
+                    this.BeginInvoke(add_, entry_message);
 
                 }
 
@@ -771,54 +803,51 @@ namespace WindChat
                 RepeatedField<IM.ChatPkt> offline_messages =
                     (RepeatedField<IM.ChatPkt>)(offline_message_field.Accessor.GetValue(ms));
 
-                if (offline_messages.Count != 0)
+
+                foreach (IM.ChatPkt message in offline_messages)
                 {
-                    foreach (IM.ChatPkt message in offline_messages)
+                    long send_id = message.SendId;
+                    string send_time = message.SendTime;
+                    string send_name = message.SendName;
+
+                    byte[] content = new byte[message.Content.Length];
+                    message.Content.CopyTo(content, 0);
+
+                    // 窗口是否存在
+                    Mark m = new Mark(int.Parse(id), send_id);
+                    Session ChatSession = SessionManager.get_instance().get_session(m);
+
+
+                    CMessage entry_message =
+                        new CMessage(send_name, send_time, Encoding.UTF8.GetString(content));
+
+                    if (ChatSession == null)
                     {
-                        long send_id = message.SendId;
-                        string send_time = message.SendTime;
+                        MessageBox.Show("新建一个！发送者id: " + id + "接受者id: " + send_id);
+                        ChatSession ch_session = new ChatSession(m, entry_message);
+                        SessionManager.get_instance().insert(m, ch_session);
 
 
-                        byte[] content = new byte[message.Content.Length]; 
-                        message.Content.CopyTo(content, 0);
+                        IM.UserUpdateReq req = new IM.UserUpdateReq();
+                        req.ReqId = long.Parse(MainForm.id);
+                        req.TargetId = send_id;
 
-                        // 窗口是否存在
-                        Mark m = new Mark(int.Parse(id), send_id);
-                        Session ChatSession = SessionManager.get_instance().get_session(m);
-
-
-                        if (ChatSession == null)
-                        {
-                            MessageBox.Show("新建一个！发送者id: " + id + "接受者id: " + send_id);
-                            ChatSession ch_session = new ChatSession(m, content);
-                            SessionManager.get_instance().insert(m, ch_session);
+                        MainForm.AsyncSend(m_client, req,
+                            (int)MsgTypeDef.Type.CUSTOM_MSG_CHANNEL_USER_UPDATE);
 
 
-                            IM.UserUpdateReq req = new IM.UserUpdateReq();
-                            req.ReqId = long.Parse(MainForm.id);
-                            req.TargetId = send_id;
-
-                            MainForm.AsyncSend(m_client, req, 
-                                (int)MsgTypeDef.Type.CUSTOM_MSG_CHANNEL_USER_UPDATE);
-
-
-                            ProcessDelegate d = new ProcessDelegate(ch_session.display);
-                            this.BeginInvoke(d, send_time);
-                        }
-                        else
-                        {
-                            // 任务栏提醒
-                            ChatSession.ShowInTaskbar = true;
-
-                            Dele_AddMessage add_ = new Dele_AddMessage(ChatSession.add_message);
-                            this.BeginInvoke(add_, content, send_time);
-
-                        }
+                        Dele_Show _display = new Dele_Show(ch_session.display);
+                        this.BeginInvoke(_display);
                     }
-                }
-                else
-                {
-                    // 没有离线消息
+                    else
+                    {
+                        // 任务栏提醒
+                        ChatSession.ShowInTaskbar = true;
+
+                        Dele_AddMessage add_ = new Dele_AddMessage(ChatSession.add_message);
+                        this.BeginInvoke(add_, entry_message);
+
+                    }
                 }
             }
             else
@@ -1209,11 +1238,171 @@ namespace WindChat
             Session.WirteFile(file_name, de_file_type);
 
 
+            
+
             string message = "成功接受文件: " + file_name;
+
+            CMessage entry_msg = new CMessage("", DateTime.Now.ToString(), message);
             Dele_AddMessage _add = new Dele_AddMessage(session.add_message);
-            this.BeginInvoke(_add, Encoding.UTF8.GetBytes(message), DateTime.Now.ToString());
+            this.BeginInvoke(_add, entry_msg);
 
         }
+
+
+
+        void handle_fetch_history(Google.Protobuf.IMessage ms)
+        {
+            var req_id_field = ms.Descriptor.FindFieldByName("req_id");
+            var target_id_field = ms.Descriptor.FindFieldByName("target_id");
+
+
+            var offline_message_field = ms.Descriptor.FindFieldByName("chat_message");
+            if (!offline_message_field.IsRepeated)
+            {
+                MessageBox.Show("fatal error! fetch history");
+                return;
+            }
+
+
+            Int64 req_id = Int64.Parse(req_id_field.Accessor.GetValue(ms).ToString());
+            Int64 target_id = Int64.Parse(target_id_field.Accessor.GetValue(ms).ToString());
+
+
+
+
+            RepeatedField<IM.ChatPkt> offline_messages =
+                (RepeatedField<IM.ChatPkt>)(offline_message_field.Accessor.GetValue(ms));
+
+            foreach (IM.ChatPkt message in offline_messages)
+            {
+                long send_id = message.SendId;
+                string send_time = message.SendTime;
+                string send_name = message.SendName;
+
+
+                byte[] content = new byte[message.Content.Length];
+                message.Content.CopyTo(content, 0);
+
+
+
+                CMessage entry_message =
+                    new CMessage(send_name, send_time, Encoding.UTF8.GetString(content));
+
+
+                // 窗口是否存在
+                Mark m = new Mark(req_id, target_id);
+                Session ChatSession = SessionManager.get_instance().get_session(m);
+
+
+                if (ChatSession == null)
+                {
+                    MessageBox.Show("新建一个！发送者id: " + id + "接受者id: " + send_id);
+                    ChatSession ch_session = new ChatSession(m);
+                    SessionManager.get_instance().insert(m, ch_session);
+
+
+                    IM.UserUpdateReq req = new IM.UserUpdateReq();
+                    req.ReqId = long.Parse(MainForm.id);
+                    req.TargetId = send_id;
+                    MainForm.AsyncSend(m_client, req,
+                        (int)MsgTypeDef.Type.CUSTOM_MSG_CHANNEL_USER_UPDATE);
+
+
+                    Dele_Show _show = new Dele_Show(ch_session.history_show);
+                    this.BeginInvoke(_show);
+
+                    Dele_AddHistory _display = new Dele_AddHistory(ch_session.add_history);
+                    this.BeginInvoke(_display, entry_message);
+                }
+                else
+                {
+                    // 任务栏提醒
+                    ChatSession.ShowInTaskbar = true;
+
+                    Dele_AddHistory _display = new Dele_AddHistory(ChatSession.add_history);
+                    this.BeginInvoke(_display, entry_message);
+
+                }
+            }
+        }
+
+
+        void handle_fetch_channel_history(Google.Protobuf.IMessage ms)
+        {
+
+            var offline_message_field = ms.Descriptor.FindFieldByName("channel_messages");
+            if (!offline_message_field.IsRepeated)
+            {
+                MessageBox.Show("channel offline fatal error!");
+                return;
+            }
+
+            RepeatedField<IM.ChannelChatPkt> offline_messages =
+                (RepeatedField<IM.ChannelChatPkt>)(offline_message_field.Accessor.GetValue(ms));
+
+
+
+            foreach (IM.ChannelChatPkt message in offline_messages)
+            {
+                long send_id        = message.SendId;
+                int channel_id      = message.ChannelId;
+                string send_time    = message.SendTime;
+                string send_name    = message.SendName;
+
+                byte[] content = new byte[message.Content.Length];
+                message.Content.CopyTo(content, 0);
+
+
+                CMessage entry_message =
+                    new CMessage(send_name, send_time, Encoding.UTF8.GetString(content));
+
+
+                // 窗口是否存在
+                Mark m = new Mark(long.Parse(MainForm.id), channel_id);
+                Session chSession = SessionManager.get_instance().get_session(m);
+
+
+                if (chSession == null)
+                {
+                    MessageBox.Show("新建一个！发送者id: " + id + "频道id: " + channel_id);
+
+
+                    ChannelSession session = new ChannelSession(m);
+                    SessionManager.get_instance().insert(m, session);
+
+                    IM.Channel channel = m_channels[channel_id];
+                    session.Text = channel.Name;
+
+
+                    // 加载缓存数据
+                    Dele_AddChannelMember _add_memeber = new Dele_AddChannelMember(session.load_members);
+                    this.BeginInvoke(_add_memeber, m_channels[channel_id]);
+
+                    Dele_Show _show = new Dele_Show(session.history_show);
+                    this.BeginInvoke(_show);
+
+                    Dele_AddHistory _display = new Dele_AddHistory(session.add_history);
+                    this.BeginInvoke(_display, entry_message);
+                }
+                else
+                {
+                    // 任务栏提醒
+                    chSession.ShowInTaskbar = true;
+                    Dele_AddHistory _display = new Dele_AddHistory(chSession.add_history);
+                    this.BeginInvoke(_display, entry_message);
+                }
+
+
+            }
+        }
+
+
+
+
+
+
+
+
 
         void handle_channel_member_exit(Google.Protobuf.IMessage ms)
         {
@@ -1394,7 +1583,7 @@ namespace WindChat
         public delegate void Dele_Show();
 
         public delegate void Dele_Display(string time);
-
+        public delegate void Dele_AddHistory(CMessage message);
 
         public delegate void Dele_SetLabelText(Label l_, string s_);
 
@@ -1513,7 +1702,7 @@ namespace WindChat
         }
 
 
-        public delegate void Dele_AddMessage(byte[] content, string  send_time);
+        public delegate void Dele_AddMessage(CMessage message);
 
         private void add_message(string content, string send_time)
         {

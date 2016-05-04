@@ -31,8 +31,8 @@ namespace WindChat
             InitializeComponent();
         }
 
-        public ChannelSession(Mark mark_, byte[] context_)
-            : base(mark_, context_)
+        public ChannelSession(Mark mark_, CMessage message)
+            : base(mark_, message)
         {
             InitializeComponent();
         }
@@ -59,6 +59,25 @@ namespace WindChat
 
         public override void show()
         {
+            this.Show();
+        }
+
+        public override void history_show()
+        {
+            base.history_show();
+            if (this.HistoryTxt.Visible == false)
+            {
+                ChannelTree.Visible = false;
+                this.HistoryTxt.Visible = true;
+
+            }
+            else
+            {
+
+                ChannelTree.Visible = true;
+                this.HistoryTxt.Visible = false;
+            }
+
             this.Show();
         }
 
@@ -161,9 +180,37 @@ namespace WindChat
 
             channelPkt.Content = 
                 Google.Protobuf.ByteString.CopyFrom(send_bytes, 0, send_bytes.Length);
-
+            channelPkt.SendName = MainForm.m_strNick_name_;
 
             MainForm.AsyncSend(MainForm.m_client, channelPkt, (int)MsgTypeDef.Type.CUSTOM_MSG_CHANNEL_CHAT);
+        }
+
+        private void HistoryBtn_Click(object sender, EventArgs e)
+        {
+
+            if (this.HistoryTxt.Visible == false)
+            {
+                ChannelTree.Visible = false;
+                this.HistoryTxt.Visible = true;
+
+                //请求频道信息
+                IM.OperateReqBase req = new IM.OperateReqBase();
+                req.ChannelId = (int)m_mark.Recv_id;
+                req.UserId = m_mark.Send_id;
+
+                MainForm.AsyncSend(MainForm.m_client, req,
+                    (int)MsgTypeDef.Type.CUSTOM_MSG_FETCH_CHANNEL_HISTORY);
+
+            }
+            else
+            {
+
+                ChannelTree.Visible = true;
+                this.HistoryTxt.Visible = false;
+                this.HistoryTxt.Text = "";
+            }
+
+
         }
     }
 }

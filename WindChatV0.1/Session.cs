@@ -18,7 +18,7 @@ namespace WindChat
     public partial class Session : CCWin.Skin_Mac
     {
         protected Boolean m_bFlashFlag = false;
-        protected List<string> m_ChatHistory = new List<string>();
+        protected List<CMessage> m_ChatHistory = new List<CMessage>();
         protected Mark m_mark; //唯一标识一个窗体
 
 
@@ -42,55 +42,67 @@ namespace WindChat
         {
             InitializeComponent();
 
-
-
             load();
             m_mark = mark_;
         }
 
-        public Session(Mark mark_, byte[] context_)
+        public Session(Mark mark_, CMessage message)
         {
             InitializeComponent();
 
             load();
-
-
-            m_ChatHistory.Add(Encoding.UTF8.GetString(context_));
+            m_ChatHistory.Add(message);
             m_mark = mark_;
         }
 
-        public void display(string time)
+
+
+
+        public void add_history(CMessage message)
+        {
+
+            this.HistoryTxt.Text += message.Send_name + " " + message.Send_time;
+            this.HistoryTxt.Text += "\r\n";
+            this.HistoryTxt.Text += "  " + message.Content;
+            this.HistoryTxt.Text += "\r\n";
+        }
+
+
+        public void display()
         {
             this.show();
-            OnDisplay(time);
+            // 加载内容
+            foreach (CMessage message in m_ChatHistory)
+            {
+                AddMessage(message);
+            }
         }
 
 
         private void OnDisplay(string time)
         {
             // 加载内容
-            foreach(string message in m_ChatHistory)
+            foreach(CMessage message in m_ChatHistory)
             {
-                AddMessage(time, message);
+                AddMessage(message);
             }
         }
 
 
 
-        public void add_message(byte[] context_, string time)
+        public void add_message(CMessage message)
         {
 
-            string de_context = Encoding.UTF8.GetString(context_);
-            m_ChatHistory.Add(de_context);
-
-            AddMessage(time, de_context);
+            m_ChatHistory.Add(message);
+            AddMessage(message);
         }
 
-        private void AddMessage(string time, string message)
+        private void AddMessage(CMessage message)
         {
-            SendedText.Text += time;
+            
+            SendedText.Text += message.Send_name + " " + message.Send_time;
             SendedText.Text += "\r\n";
-            SendedText.Text += "  " + message;
+            SendedText.Text += "  " + message.Content;
             SendedText.Text += "\r\n";
  
         }
@@ -149,6 +161,17 @@ namespace WindChat
 
 
         public virtual void show() { }
+        public virtual void history_show()
+        {
+            if (HistoryTxt.Visible == false)
+            {
+                this.Width += 115;
+            }
+            else
+            {
+                this.Width -= 115;
+            }
+        }
 
 
         private void SendFile(byte[] file_data)
@@ -233,12 +256,12 @@ namespace WindChat
         }
 
         public delegate void Dele_show(int x, int y);
-        public delegate void Dele_Addmsg(byte[] context_, string time);
+        public delegate void Dele_Addmsg(CMessage message);
 
         private void SendBtn_Click(object sender, EventArgs e)
         {
 
-            SendedText.Text += DateTime.Now.ToString();
+            SendedText.Text += MainForm.m_strNick_name_ + " " + DateTime.Now.ToString();
             SendedText.Text += "\r\n";
             SendedText.Text += "  " + SendingText.Text;
             SendedText.Text += "\r\n";
@@ -309,8 +332,9 @@ namespace WindChat
 
             string tips = "成功发送文件: " + file_trans.Name;
 
+            CMessage message = new CMessage("", DateTime.Now.ToString(), tips);
             Dele_Addmsg _add = new Dele_Addmsg(this.add_message);
-            this.BeginInvoke(_add, Encoding.UTF8.GetBytes(tips), DateTime.Now.ToString());
+            this.BeginInvoke(_add, message);
 
 
         }
@@ -348,6 +372,19 @@ namespace WindChat
                 SendFilePb(filePath);
 
             }
+        }
+
+        private void HistoryBtn_Click(object sender, EventArgs e)
+        {
+            if(HistoryTxt.Visible == false)
+            {
+                this.Width += 115;
+            }
+            else
+            {
+                this.Width -= 115;
+            }
+
         }
     }
 }

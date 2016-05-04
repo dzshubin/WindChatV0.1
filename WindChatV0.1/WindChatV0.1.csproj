@@ -72,6 +72,7 @@
     <Compile Include="Channel.cs" />
     <Compile Include="ChannelBaseInfo.cs" />
     <Compile Include="ChannelMembers.cs" />
+    <Compile Include="Chat.cs" />
     <Compile Include="CommDef.cs" />
     <Compile Include="ChannelSession.cs">
       <SubType>Form</SubType>
@@ -79,11 +80,12 @@
     <Compile Include="ChannelSession.Designer.cs">
       <DependentUpon>ChannelSession.cs</DependentUpon>
     </Compile>
-    <Compile Include="Chat.cs" />
     <Compile Include="Compression.cs" />
     <Compile Include="Contacts.cs" />
     <Compile Include="EnumDef.cs" />
+    <Compile Include="FetchHistory.cs" />
     <Compile Include="FileTranfer.cs" />
+    <Compile Include="HistoryMsg.cs" />
     <Compile Include="ImageListPopup.cs" />
     <Compile Include="Login.cs" />
     <Compile Include="LoginForm.cs">
@@ -99,6 +101,7 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Mark.cs" />
+    <Compile Include="Message.cs" />
     <Compile Include="MessageCach.cs" />
     <Compile Include="MsgTypeDef.cs" />
     <Compile Include="OperateChannel.cs" />

@@ -29,8 +29,8 @@ namespace WindChat
             InitializeComponent();
         }
 
-        public ChatSession(Mark mark_, byte[] context_)
-            :base(mark_, context_)
+        public ChatSession(Mark mark_, CMessage message)
+            :base(mark_, message)
         {
             InitializeComponent();
 
@@ -54,6 +54,7 @@ namespace WindChat
             chatPkt.SendId = m_mark.Send_id;
             chatPkt.Content =
                 Google.Protobuf.ByteString.CopyFrom(send_bytes, 0, send_bytes.Length);
+            chatPkt.SendName = MainForm.m_strNick_name_;
 
             MainForm.AsyncSend(MainForm.m_client, chatPkt, (int)MsgTypeDef.Type.CUSTOM_MSG_CHAT);
         }
@@ -65,6 +66,52 @@ namespace WindChat
 
         private void ChatSession_Load(object sender, EventArgs e)
         {
+
+        }
+
+        public override void history_show()
+        {
+            base.history_show();
+            if (this.HistoryTxt.Visible == false)
+            {
+
+                this.Width += 170;
+                this.HistoryTxt.Visible = true;
+
+            }
+            else
+            {
+                this.Width -= 170;
+                this.HistoryTxt.Visible = false;
+                this.HistoryTxt.Text = "";
+            }
+
+            this.Show();
+        }
+
+
+        private void HistoryBtn_Click(object sender, EventArgs e)
+        {
+
+
+            if (this.HistoryTxt.Visible == false)
+            {
+                IM.FetchHistoryReq req = new IM.FetchHistoryReq();
+                req.ReqId = m_mark.Send_id;
+                req.TargetId = m_mark.Recv_id;
+
+                MainForm.AsyncSend(MainForm.m_client, req, (int)MsgTypeDef.Type.CUSTOM_MSG_FETCH_HISTORY);
+
+                this.Width += 170;
+                this.HistoryTxt.Visible = true;
+
+            }
+            else
+            {
+                this.Width -= 170;
+                this.HistoryTxt.Visible = false;
+                this.HistoryTxt.Text = "";
+            }
 
         }
     }

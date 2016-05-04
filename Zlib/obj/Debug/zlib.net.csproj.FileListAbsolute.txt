@@ -7,3 +7,4 @@ E:\Project\WindChatV0.1\Zlib\bin\Debug\zlib.net.dll
 E:\Project\WindChatV0.1\Zlib\bin\Debug\zlib.net.pdb
 E:\Project\WindChatV0.1\Zlib\obj\Debug\zlib.net.dll
 E:\Project\WindChatV0.1\Zlib\obj\Debug\zlib.net.pdb
+E:\Project\WindChatV0.1\Zlib\obj\Debug\zlib.net.csprojResolveAssemblyReference.cache

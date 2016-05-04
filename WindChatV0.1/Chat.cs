@@ -23,16 +23,17 @@ namespace IM {
     static ChatReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "CgpjaGF0LnByb3RvEgJJTSJPCgdDaGF0UGt0Eg8KB3NlbmRfaWQYASABKAMS",
+            "CgpjaGF0LnByb3RvEgJJTSJiCgdDaGF0UGt0Eg8KB3NlbmRfaWQYASABKAMS",
             "DwoHcmVjdl9pZBgCIAEoAxIPCgdjb250ZW50GAMgASgMEhEKCXNlbmRfdGlt",
-            "ZRgEIAEoCSJqCg5DaGFubmVsQ2hhdFBrdBIPCgdzZW5kX2lkGAEgASgDEg8K",
-            "B3JlY3ZfaWQYAiABKAMSEgoKY2hhbm5lbF9pZBgDIAEoBRIPCgdjb250ZW50",
-            "GAQgASgMEhEKCXNlbmRfdGltZRgFIAEoCWIGcHJvdG8z"));
+            "ZRgEIAEoCRIRCglzZW5kX25hbWUYBSABKAkifQoOQ2hhbm5lbENoYXRQa3QS",
+            "DwoHc2VuZF9pZBgBIAEoAxIPCgdyZWN2X2lkGAIgASgDEhIKCmNoYW5uZWxf",
+            "aWQYAyABKAUSDwoHY29udGVudBgEIAEoDBIRCglzZW5kX3RpbWUYBSABKAkS",
+            "EQoJc2VuZF9uYW1lGAYgASgJYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedCodeInfo(null, new pbr::GeneratedCodeInfo[] {
-            new pbr::GeneratedCodeInfo(typeof(global::IM.ChatPkt), global::IM.ChatPkt.Parser, new[]{ "SendId", "RecvId", "Content", "SendTime" }, null, null, null),
-            new pbr::GeneratedCodeInfo(typeof(global::IM.ChannelChatPkt), global::IM.ChannelChatPkt.Parser, new[]{ "SendId", "RecvId", "ChannelId", "Content", "SendTime" }, null, null, null)
+            new pbr::GeneratedCodeInfo(typeof(global::IM.ChatPkt), global::IM.ChatPkt.Parser, new[]{ "SendId", "RecvId", "Content", "SendTime", "SendName" }, null, null, null),
+            new pbr::GeneratedCodeInfo(typeof(global::IM.ChannelChatPkt), global::IM.ChannelChatPkt.Parser, new[]{ "SendId", "RecvId", "ChannelId", "Content", "SendTime", "SendName" }, null, null, null)
           }));
     }
     #endregion
@@ -63,6 +64,7 @@ namespace IM {
       recvId_ = other.recvId_;
       content_ = other.content_;
       sendTime_ = other.sendTime_;
+      sendName_ = other.sendName_;
     }
 
     public ChatPkt Clone() {
@@ -121,6 +123,19 @@ namespace IM {
       }
     }
 
+    /// <summary>Field number for the "send_name" field.</summary>
+    public const int SendNameFieldNumber = 5;
+    private string sendName_ = "";
+    /// <summary>
+    ///  发送者昵称
+    /// </summary>
+    public string SendName {
+      get { return sendName_; }
+      set {
+        sendName_ = pb::Preconditions.CheckNotNull(value, "value");
+      }
+    }
+
     public override bool Equals(object other) {
       return Equals(other as ChatPkt);
     }
@@ -136,6 +151,7 @@ namespace IM {
       if (RecvId != other.RecvId) return false;
       if (Content != other.Content) return false;
       if (SendTime != other.SendTime) return false;
+      if (SendName != other.SendName) return false;
       return true;
     }
 
@@ -145,6 +161,7 @@ namespace IM {
       if (RecvId != 0L) hash ^= RecvId.GetHashCode();
       if (Content.Length != 0) hash ^= Content.GetHashCode();
       if (SendTime.Length != 0) hash ^= SendTime.GetHashCode();
+      if (SendName.Length != 0) hash ^= SendName.GetHashCode();
       return hash;
     }
 
@@ -169,6 +186,10 @@ namespace IM {
         output.WriteRawTag(34);
         output.WriteString(SendTime);
       }
+      if (SendName.Length != 0) {
+        output.WriteRawTag(42);
+        output.WriteString(SendName);
+      }
     }
 
     public int CalculateSize() {
@@ -184,6 +205,9 @@ namespace IM {
       }
       if (SendTime.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(SendTime);
+      }
+      if (SendName.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(SendName);
       }
       return size;
     }
@@ -203,6 +227,9 @@ namespace IM {
       }
       if (other.SendTime.Length != 0) {
         SendTime = other.SendTime;
+      }
+      if (other.SendName.Length != 0) {
+        SendName = other.SendName;
       }
     }
 
@@ -227,6 +254,10 @@ namespace IM {
           }
           case 34: {
             SendTime = input.ReadString();
+            break;
+          }
+          case 42: {
+            SendName = input.ReadString();
             break;
           }
         }
@@ -260,6 +291,7 @@ namespace IM {
       channelId_ = other.channelId_;
       content_ = other.content_;
       sendTime_ = other.sendTime_;
+      sendName_ = other.sendName_;
     }
 
     public ChannelChatPkt Clone() {
@@ -331,6 +363,19 @@ namespace IM {
       }
     }
 
+    /// <summary>Field number for the "send_name" field.</summary>
+    public const int SendNameFieldNumber = 6;
+    private string sendName_ = "";
+    /// <summary>
+    ///  发送者昵称
+    /// </summary>
+    public string SendName {
+      get { return sendName_; }
+      set {
+        sendName_ = pb::Preconditions.CheckNotNull(value, "value");
+      }
+    }
+
     public override bool Equals(object other) {
       return Equals(other as ChannelChatPkt);
     }
@@ -347,6 +392,7 @@ namespace IM {
       if (ChannelId != other.ChannelId) return false;
       if (Content != other.Content) return false;
       if (SendTime != other.SendTime) return false;
+      if (SendName != other.SendName) return false;
       return true;
     }
 
@@ -357,6 +403,7 @@ namespace IM {
       if (ChannelId != 0) hash ^= ChannelId.GetHashCode();
       if (Content.Length != 0) hash ^= Content.GetHashCode();
       if (SendTime.Length != 0) hash ^= SendTime.GetHashCode();
+      if (SendName.Length != 0) hash ^= SendName.GetHashCode();
       return hash;
     }
 
@@ -385,6 +432,10 @@ namespace IM {
         output.WriteRawTag(42);
         output.WriteString(SendTime);
       }
+      if (SendName.Length != 0) {
+        output.WriteRawTag(50);
+        output.WriteString(SendName);
+      }
     }
 
     public int CalculateSize() {
@@ -403,6 +454,9 @@ namespace IM {
       }
       if (SendTime.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(SendTime);
+      }
+      if (SendName.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(SendName);
       }
       return size;
     }
@@ -425,6 +479,9 @@ namespace IM {
       }
       if (other.SendTime.Length != 0) {
         SendTime = other.SendTime;
+      }
+      if (other.SendName.Length != 0) {
+        SendName = other.SendName;
       }
     }
 
@@ -453,6 +510,10 @@ namespace IM {
           }
           case 42: {
             SendTime = input.ReadString();
+            break;
+          }
+          case 50: {
+            SendName = input.ReadString();
             break;
           }
         }

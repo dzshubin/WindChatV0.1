@@ -36,13 +36,15 @@
             this.OpenFileBtn = new System.Windows.Forms.Button();
             this.SendingText = new CCWin.SkinControl.SkinTextBox();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.HistoryBtn = new System.Windows.Forms.Button();
+            this.HistoryTxt = new CCWin.SkinControl.SkinTextBox();
             this.SuspendLayout();
             // 
             // SendBtn
             // 
-            this.SendBtn.Location = new System.Drawing.Point(364, 529);
+            this.SendBtn.Location = new System.Drawing.Point(387, 529);
             this.SendBtn.Name = "SendBtn";
-            this.SendBtn.Size = new System.Drawing.Size(115, 23);
+            this.SendBtn.Size = new System.Drawing.Size(92, 23);
             this.SendBtn.TabIndex = 2;
             this.SendBtn.Text = "Send";
             this.SendBtn.UseVisualStyleBackColor = true;
@@ -157,12 +159,67 @@
             // 
             this.openFileDialog.FileName = "openFileDialog1";
             // 
+            // HistoryBtn
+            // 
+            this.HistoryBtn.Location = new System.Drawing.Point(89, 356);
+            this.HistoryBtn.Name = "HistoryBtn";
+            this.HistoryBtn.Size = new System.Drawing.Size(75, 23);
+            this.HistoryBtn.TabIndex = 9;
+            this.HistoryBtn.Text = "历史消息";
+            this.HistoryBtn.UseVisualStyleBackColor = true;
+            this.HistoryBtn.Click += new System.EventHandler(this.HistoryBtn_Click);
+            // 
+            // HistoryTxt
+            // 
+            this.HistoryTxt.BackColor = System.Drawing.Color.Transparent;
+            this.HistoryTxt.DownBack = null;
+            this.HistoryTxt.Icon = null;
+            this.HistoryTxt.IconIsButton = false;
+            this.HistoryTxt.IconMouseState = CCWin.SkinClass.ControlState.Normal;
+            this.HistoryTxt.IsPasswordChat = '\0';
+            this.HistoryTxt.IsSystemPasswordChar = false;
+            this.HistoryTxt.Lines = new string[0];
+            this.HistoryTxt.Location = new System.Drawing.Point(489, 36);
+            this.HistoryTxt.Margin = new System.Windows.Forms.Padding(0);
+            this.HistoryTxt.MaxLength = 32767;
+            this.HistoryTxt.MinimumSize = new System.Drawing.Size(28, 28);
+            this.HistoryTxt.MouseBack = null;
+            this.HistoryTxt.MouseState = CCWin.SkinClass.ControlState.Normal;
+            this.HistoryTxt.Multiline = true;
+            this.HistoryTxt.Name = "HistoryTxt";
+            this.HistoryTxt.NormlBack = null;
+            this.HistoryTxt.Padding = new System.Windows.Forms.Padding(5);
+            this.HistoryTxt.ReadOnly = false;
+            this.HistoryTxt.ScrollBars = System.Windows.Forms.ScrollBars.None;
+            this.HistoryTxt.Size = new System.Drawing.Size(279, 516);
+            // 
+            // 
+            // 
+            this.HistoryTxt.SkinTxt.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.HistoryTxt.SkinTxt.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.HistoryTxt.SkinTxt.Font = new System.Drawing.Font("微软雅黑", 9.75F);
+            this.HistoryTxt.SkinTxt.Location = new System.Drawing.Point(5, 5);
+            this.HistoryTxt.SkinTxt.Multiline = true;
+            this.HistoryTxt.SkinTxt.Name = "BaseText";
+            this.HistoryTxt.SkinTxt.Size = new System.Drawing.Size(269, 506);
+            this.HistoryTxt.SkinTxt.TabIndex = 0;
+            this.HistoryTxt.SkinTxt.WaterColor = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(127)))), ((int)(((byte)(127)))));
+            this.HistoryTxt.SkinTxt.WaterText = "";
+            this.HistoryTxt.TabIndex = 10;
+            this.HistoryTxt.TextAlign = System.Windows.Forms.HorizontalAlignment.Left;
+            this.HistoryTxt.Visible = false;
+            this.HistoryTxt.WaterColor = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(127)))), ((int)(((byte)(127)))));
+            this.HistoryTxt.WaterText = "";
+            this.HistoryTxt.WordWrap = true;
+            // 
             // Session
             // 
             this.AcceptButton = this.SendBtn;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(488, 555);
+            this.ClientSize = new System.Drawing.Size(487, 557);
+            this.Controls.Add(this.HistoryTxt);
+            this.Controls.Add(this.HistoryBtn);
             this.Controls.Add(this.SendingText);
             this.Controls.Add(this.OpenFileBtn);
             this.Controls.Add(this.SendedText);
@@ -183,5 +240,7 @@
         protected System.Windows.Forms.Button OpenFileBtn;
         protected CCWin.SkinControl.SkinTextBox SendingText;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
+        protected System.Windows.Forms.Button HistoryBtn;
+        protected CCWin.SkinControl.SkinTextBox HistoryTxt;
     }
 }
